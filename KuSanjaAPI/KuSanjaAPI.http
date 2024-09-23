@@ -1,0 +1,6 @@
+@KuSanjaAPI_HostAddress = http://localhost:5093
+
+GET {{KuSanjaAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
