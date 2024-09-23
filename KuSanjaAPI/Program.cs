@@ -1,3 +1,5 @@
+using Microsoft.OpenApi.Models;
+
 namespace KuSanjaAPI;
 
 public class Program
@@ -11,7 +13,18 @@ public class Program
 		builder.Services.AddControllers();
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
+		builder.Services.AddSwaggerGen(c =>
+		{
+			c.SwaggerDoc("v1", new OpenApiInfo { Title = "KuSanjaAPI", Version = "v1" });
+		});
+		builder.Services.AddCors(options =>
+		{
+			var frontendURL = builder.Configuration.GetValue<string>("FrontendURL");
+			options.AddDefaultPolicy(builder =>
+			{
+				builder.WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader();
+			});
+		});
 
 		var app = builder.Build();
 
@@ -19,13 +32,18 @@ public class Program
 		if (app.Environment.IsDevelopment())
 		{
 			app.UseSwagger();
-			app.UseSwaggerUI();
+			app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "KuSanjaAPI"));
 		}
 
 		app.UseHttpsRedirection();
 
-		app.UseAuthorization();
+		app.UseRouting();
 
+		app.UseCors();
+
+		app.UseAuthentication();
+
+		app.UseAuthorization();
 
 		app.MapControllers();
 
